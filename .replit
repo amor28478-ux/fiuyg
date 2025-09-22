@@ -1,0 +1,6 @@
+language = "nodejs"
+run = "npm start"
+
+[packager]
+language = "nodejs"
+ignoredPaths = ["node_modules", ".git"]

